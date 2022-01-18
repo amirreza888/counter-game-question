@@ -6,7 +6,7 @@ def standard_time(string_time):
 class Player():
     usernames_map = dict()
 
-    def __init__(self, username, team, time):
+    def __init__(self, username, team,time, round):
         if (self.__initialized):
             return
         self.__initialized = True
@@ -19,6 +19,8 @@ class Player():
         self.pistol = None
         self.knife = gun_map.get("knife")
         self.health = 100
+        self.round = round
+        self.time = standard_time(time)
         if standard_time(time) >= standard_time("00:03:00"):
             self.health = 0
 
@@ -126,14 +128,14 @@ class Team():
             cls.team_name_map[name].__initialized = False
         return cls.team_name_map[name]
 
-    def add_player(self, user_name, time):
+    def add_player(self, user_name, time, round):
         if Player.usernames_map.get(user_name):
             print("you are already in this game")
         elif len(self.players) == 10:
             print("this team is full")
         else:
             print(f"this user added to {self.name}")
-            player = Player(username=user_name, team=self, time= time)
+            player = Player(username=user_name, team=self, time= time, round=round)
             Player.usernames_map[user_name] = player
             self.players.append(player)
 
@@ -151,7 +153,7 @@ class Team():
 
     def show_board(self):
         print(f"{self.name}-Players:")
-        self.players.sort(key= lambda x:(x.kill_count, -x.killed_count,))
+        self.players.sort(key= lambda x:(x.kill_count, -x.killed_count,x.round, x.time))
         for i, player in enumerate(self.players):
             print(i+1, player.username, player.kill_count, player.killed_count)
 
@@ -192,7 +194,7 @@ while round_number < R:
         input_command = input().split()
         if input_command[0] == "ADD-USER":
             _, user_name, team_name, time = input_command
-            Team(team_name).add_player(user_name, time)
+            Team(team_name).add_player(user_name, time, round_number)
         elif input_command[0] == "GET-MONEY":
             _, user_name, time = input_command
             Player.get_money(user_name)
